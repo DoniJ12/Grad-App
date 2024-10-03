@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
-  const [images, setImages] = useState([]);
+  const [imageData, setImageData] = useState([]);
 
-  // Load the submitted images from localStorage
+  // Load the submitted images and quotes from localStorage
   useEffect(() => {
-    const storedImages = JSON.parse(localStorage.getItem('submittedImages'));
-    if (storedImages) {
-      setImages(storedImages);
+    const storedImageData = JSON.parse(localStorage.getItem('submittedImageData'));
+    if (storedImageData) {
+      setImageData(storedImageData);
     }
   }, []);
 
@@ -29,12 +29,13 @@ const HomePage = () => {
         </Link>
       </main>
       <section style={styles.imageSection}>
-        <h2>Your Uploaded Images</h2>
-        {images.length > 0 ? (
+        <h2>Your Uploaded Images and Quotes</h2>
+        {imageData.length > 0 ? (
           <div style={styles.imageGrid}>
-            {images.map((image, index) => (
+            {imageData.map((image, index) => (
               <div key={index} style={styles.imageWrapper}>
-                <img src={image} alt={`Uploaded ${index}`} style={styles.image} />
+                <img src={image.src} alt={`Uploaded ${index}`} style={styles.image} />
+                <p style={styles.quote}>{image.quote}</p>
               </div>
             ))}
           </div>
@@ -101,6 +102,11 @@ const styles = {
   image: {
     width: '100%',
     height: 'auto',
+  },
+  quote: {
+    padding: '10px',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 };
 
