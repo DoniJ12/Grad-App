@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import Header from './Header'; // Import the Header
 
 const ImageUploader = () => {
   const [imageData, setImageData] = useState([]);
-  const [submitted, setSubmitted] = useState(false);
 
-  // Load the image and quote data from localStorage on component mount
   useEffect(() => {
     const storedImageData = JSON.parse(localStorage.getItem('submittedImageData'));
     if (storedImageData) {
@@ -12,7 +11,6 @@ const ImageUploader = () => {
     }
   }, []);
 
-  // Function to handle multiple image uploads
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     const newImageData = [];
@@ -23,7 +21,6 @@ const ImageUploader = () => {
         const base64Image = reader.result;
         newImageData.push({ src: base64Image, quote: '' });
 
-        // Once all files are read, update the state
         if (newImageData.length === files.length) {
           const updatedImageData = [...imageData, ...newImageData];
           setImageData(updatedImageData);
@@ -31,74 +28,99 @@ const ImageUploader = () => {
       };
 
       if (file) {
-        reader.readAsDataURL(file); // Read each file as a data URL
+        reader.readAsDataURL(file);
       }
     });
   };
 
-  // Function to handle the quote input
   const handleQuoteChange = (index, newQuote) => {
-    const updatedImageData = imageData.map((item, i) => 
+    const updatedImageData = imageData.map((item, i) =>
       i === index ? { ...item, quote: newQuote } : item
     );
     setImageData(updatedImageData);
   };
 
-  // Handle submit to save images and quotes together
+  // Remove an image and its quote, and update localStorage
+  const handleRemoveImage = (index) => {
+    const updatedImageData = imageData.filter((_, i) => i !== index);
+    setImageData(updatedImageData);
+    localStorage.setItem('submittedImageData', JSON.stringify(updatedImageData)); // Update localStorage immediately
+  };
+
   const handleSubmit = () => {
     localStorage.setItem('submittedImageData', JSON.stringify(imageData));
-    setSubmitted(true);
   };
 
   return (
-    <div className="image-uploader">
-      <h2>Upload Images and Add Quotes</h2>
-      <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
-      {imageData.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '20px' }}>
-          {imageData.map((image, index) => (
-            <div key={index}>
-              <img src={image.src} alt={`Uploaded ${index}`} style={{ width: '100%', height: 'auto' }} />
-              <textarea
-                placeholder="Enter a quote for this image"
-                value={image.quote || ''}
-                onChange={(e) => handleQuoteChange(index, e.target.value)}
-                style={styles.textarea}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-      <button onClick={handleSubmit} style={styles.submitButton}>
-        Submit Images and Quotes
-      </button>
-      {submitted && <p style={styles.message}>Images and quotes submitted!</p>}
+    <div>
+      <Header /> {/* Use the Header */}
+      <div className="image-uploader">
+        <h2>Upload Images and Add Quotes</h2>
+        <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
+        {imageData.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '20px' }}>
+            {imageData.map((image, index) => (
+              <div key={index} style={styles.imageContainer}>
+                <img src={image.src} alt={`Uploaded ${index}`} style={styles.image} />
+                <textarea
+                  placeholder="Enter a quote for this image"
+                  value={image.quote || ''}
+                  onChange={(e) => handleQuoteChange(index, e.target.value)}
+                  style={styles.textarea}
+                />
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  style={styles.removeButton}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <button onClick={handleSubmit} style={styles.submitButton}>Submit</button>
+      </div>
     </div>
   );
 };
 
 const styles = {
-  submitButton: {
-    padding: '10px 20px',
-    fontSize: '1.2rem',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    marginTop: '20px',
+  imageContainer: {
+    position: 'relative',
+    paddingBottom: '20px',
   },
-  message: {
-    marginTop: '10px',
-    color: 'green',
+  image: {
+    width: '100%',
+    height: 'auto',
   },
   textarea: {
-    width: '100%',
     marginTop: '10px',
     padding: '10px',
+    width: '100%',
+  },
+  removeButton: {
+    marginTop: '10px',
+    padding: '5px 10px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
     borderRadius: '5px',
-    border: '1px solid #ccc',
-  }
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
+  submitButton: {
+    marginTop: '20px',
+    padding: '10px 20px',
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    borderRadius: '5px',
+  },
 };
 
 export default ImageUploader;

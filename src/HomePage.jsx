@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Header from './Header'; // Import Header
 
 const HomePage = () => {
   const [imageData, setImageData] = useState([]);
 
-  // Load the submitted images and quotes from localStorage
   useEffect(() => {
     const storedImageData = JSON.parse(localStorage.getItem('submittedImageData'));
     if (storedImageData) {
@@ -14,99 +14,41 @@ const HomePage = () => {
 
   return (
     <div>
-      <header style={styles.header}>
-        <div style={styles.logo}>MyApp</div>
-        <nav style={styles.nav}>
-          <a href="#contact" style={styles.navItem}>Contact Us</a>
-          <a href="#about" style={styles.navItem}>About</a>
-          <a href="#profile" style={styles.navItem}>Profile</a>
-        </nav>
-      </header>
-      <main style={styles.main}>
-        <h1>Welcome to MyApp!</h1>
+      <Header /> {/* Use the Header */}
+      <main style={{ padding: '20px' }}>
+        <h1>Welcome to the Home Page</h1>
         <Link to="/upload">
-          <button style={styles.button}>Go to Image Uploader</button>
+          <button style={styles.uploadButton}>Go to Image Uploader</button>
         </Link>
+        <div style={{ marginTop: '40px' }}>
+          <h2>Uploaded Images</h2>
+          {imageData.length === 0 ? (
+            <p>No images uploaded yet.</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+              {imageData.map((image, index) => (
+                <div key={index}>
+                  <img src={image.src} alt={`Uploaded ${index}`} style={{ width: '100%', height: 'auto' }} />
+                  <p>{image.quote || 'No quote provided.'}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
-      <section style={styles.imageSection}>
-        <h2>Your Uploaded Images and Quotes</h2>
-        {imageData.length > 0 ? (
-          <div style={styles.imageGrid}>
-            {imageData.map((image, index) => (
-              <div key={index} style={styles.imageWrapper}>
-                <img src={image.src} alt={`Uploaded ${index}`} style={styles.image} />
-                <p style={styles.quote}>{image.quote}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No Images</p>
-        )}
-      </section>
     </div>
   );
 };
 
 const styles = {
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  uploadButton: {
     padding: '10px 20px',
-    backgroundColor: '#f5f5f5',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-  },
-  logo: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-  },
-  nav: {
-    display: 'flex',
-    gap: '15px',
-  },
-  navItem: {
-    textDecoration: 'none',
-    color: '#333',
-    fontSize: '1rem',
-  },
-  main: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '60vh',
-  },
-  button: {
-    padding: '10px 20px',
-    fontSize: '1.2rem',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
-    borderRadius: '5px',
     cursor: 'pointer',
-  },
-  imageSection: {
-    marginTop: '40px',
-    padding: '20px',
-  },
-  imageGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '10px',
-  },
-  imageWrapper: {
-    border: '1px solid #ccc',
+    fontSize: '1rem',
     borderRadius: '5px',
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: 'auto',
-  },
-  quote: {
-    padding: '10px',
-    fontStyle: 'italic',
-    textAlign: 'center',
   },
 };
 
