@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Header from './Header'; // Import the Header
+import Header from './Header'; // Import Header
 
 const ImageUploader = () => {
   const [imageData, setImageData] = useState([]);
+  const [currentStack, setCurrentStack] = useState([]);
+  const [quote, setQuote] = useState('');
 
   useEffect(() => {
     const storedImageData = JSON.parse(localStorage.getItem('submittedImageData'));
@@ -15,15 +17,14 @@ const ImageUploader = () => {
     const files = Array.from(e.target.files);
     const newImageData = [];
 
-    files.forEach((file, index) => {
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64Image = reader.result;
-        newImageData.push({ src: base64Image, quote: '' });
+        newImageData.push(base64Image);
 
         if (newImageData.length === files.length) {
-          const updatedImageData = [...imageData, ...newImageData];
-          setImageData(updatedImageData);
+          setCurrentStack([...currentStack, ...newImageData]);
         }
       };
 
@@ -33,52 +34,48 @@ const ImageUploader = () => {
     });
   };
 
-  const handleQuoteChange = (index, newQuote) => {
-    const updatedImageData = imageData.map((item, i) =>
-      i === index ? { ...item, quote: newQuote } : item
-    );
-    setImageData(updatedImageData);
-  };
-
-  // Remove an image and its quote, and update localStorage
-  const handleRemoveImage = (index) => {
-    const updatedImageData = imageData.filter((_, i) => i !== index);
-    setImageData(updatedImageData);
-    localStorage.setItem('submittedImageData', JSON.stringify(updatedImageData)); // Update localStorage immediately
-  };
-
-  const handleSubmit = () => {
-    localStorage.setItem('submittedImageData', JSON.stringify(imageData));
+  const handleSubmitStack = () => {
+    if (currentStack.length > 0 && quote) {
+      const newStack = { images: currentStack, quote };
+      const updatedImageData = [...imageData, newStack];
+      setImageData(updatedImageData);
+      localStorage.setItem('submittedImageData', JSON.stringify(updatedImageData));
+      setCurrentStack([]);
+      setQuote('');
+    }
   };
 
   return (
     <div>
       <Header /> {/* Use the Header */}
       <div className="image-uploader">
-        <h2>Upload Images and Add Quotes</h2>
+        <h2>Upload Images and Add a Quote for the Stack</h2>
         <input type="file" accept="image/*" multiple onChange={handleImageUpload} />
-        {imageData.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '20px' }}>
-            {imageData.map((image, index) => (
-              <div key={index} style={styles.imageContainer}>
-                <img src={image.src} alt={`Uploaded ${index}`} style={styles.image} />
-                <textarea
-                  placeholder="Enter a quote for this image"
-                  value={image.quote || ''}
-                  onChange={(e) => handleQuoteChange(index, e.target.value)}
-                  style={styles.textarea}
-                />
-                <button
-                  onClick={() => handleRemoveImage(index)}
-                  style={styles.removeButton}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
+
+        {currentStack.length > 0 && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '20px' }}>
+              {currentStack.map((image, index) => (
+                <div key={index} style={styles.imageContainer}>
+                  <img src={image} alt={`Uploaded ${index}`} style={styles.image} />
+                </div>
+              ))}
+            </div>
+
+            <textarea
+              placeholder="Enter a quote for this stack of images"
+              value={quote}
+              onChange={(e) => setQuote(e.target.value)}
+              style={styles.textarea}
+            />
+          </>
         )}
-        <button onClick={handleSubmit} style={styles.submitButton}>Submit</button>
+
+        {currentStack.length > 0 && (
+          <button onClick={handleSubmitStack} style={styles.submitButton}>
+            Submit Stack
+          </button>
+        )}
       </div>
     </div>
   );
@@ -86,7 +83,6 @@ const ImageUploader = () => {
 
 const styles = {
   imageContainer: {
-    position: 'relative',
     paddingBottom: '20px',
   },
   image: {
@@ -97,19 +93,6 @@ const styles = {
     marginTop: '10px',
     padding: '10px',
     width: '100%',
-  },
-  removeButton: {
-    marginTop: '10px',
-    padding: '5px 10px',
-    backgroundColor: '#dc3545',
-    color: 'white',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    borderRadius: '5px',
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
   },
   submitButton: {
     marginTop: '20px',
