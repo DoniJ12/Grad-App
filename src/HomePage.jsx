@@ -1,27 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
+import Modal from './Modal';
 
-const HomePage = ({ imageStacks = [] }) => {
+const HomePage = ({ imageStacks }) => {
+  const [expandedStackIndex, setExpandedStackIndex] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const toggleExpandStack = (index) => {
+    setExpandedStackIndex(expandedStackIndex === index ? null : index);
+  };
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
-    <div className="min-h-screen p-5">
+    <div className="min-h-screen bg-gray-100">
       <Header />
-      <header className="flex flex-col items-center mt-10">
-        <h1 className="text-3xl font-bold mb-5">Welcome to the Image Gallery</h1>
-      </header>
-      <section className="mt-10">
-        {imageStacks.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 mt-5">
-            {imageStacks.map((stack, index) => (
-              <div key={index} className="relative p-2 bg-gray-200 rounded shadow hover:bg-gray-300 cursor-pointer">
-                <img src={stack.images[0]} alt="Stack Thumbnail" className="w-full h-auto object-cover rounded" />
-                <p className="text-center mt-2 text-gray-600">{stack.quote}</p>
+      <div className="p-8">
+        <h1 className="text-4xl font-bold mb-8">Image Gallery</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {imageStacks.length > 0 ? (
+            imageStacks.map((stack, index) => (
+              <div key={index} className="bg-white p-4 rounded-lg shadow">
+                <div className="relative">
+                  <img
+                    src={stack.images[0]}
+                    alt="Thumbnail"
+                    className="w-full h-48 object-cover rounded-lg cursor-pointer"
+                    onClick={() => toggleExpandStack(index)}
+                  />
+                  <p className="mt-2 text-sm text-gray-700">{stack.quote}</p>
+                </div>
+                {expandedStackIndex === index && (
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {stack.images.map((image, i) => (
+                      <img
+                        key={i}
+                        src={image}
+                        alt={`Image ${i + 1}`}
+                        className="w-full h-24 object-cover rounded cursor-pointer"
+                        onClick={() => openModal(image)}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center mt-10 text-gray-500">No Images</p>
-        )}
-      </section>
+            ))
+          ) : (
+            <p className="col-span-full text-gray-500 text-center">No Images</p>
+          )}
+        </div>
+      </div>
+
+      {/* Modal for viewing individual images */}
+      <Modal image={selectedImage} onClose={closeModal} />
     </div>
   );
 };

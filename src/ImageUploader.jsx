@@ -24,20 +24,26 @@ const ImageUploader = ({ addImageStack }) => {
   };
 
   return (
-    <div className="min-h-screen p-5">
+    <div className="min-h-screen bg-gray-100">
       <Header />
-      <div className="flex flex-col items-center mt-10">
-        <input type="file" multiple onChange={handleImageUpload} className="mb-5" />
+      <div className="flex flex-col items-center p-8">
+        <h2 className="text-3xl font-semibold mb-6">Upload Images</h2>
+        <input 
+          type="file" 
+          multiple 
+          onChange={handleImageUpload} 
+          className="mb-4 p-2 border border-gray-300 rounded"
+        />
         <input 
           type="text" 
           placeholder="Enter quote" 
           value={quote} 
           onChange={(e) => setQuote(e.target.value)} 
-          className="mb-5 p-2 border rounded"
+          className="mb-4 p-2 w-full max-w-md border border-gray-300 rounded"
         />
         <button 
           onClick={handleSubmit} 
-          className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700"
         >
           Submit
         </button>
