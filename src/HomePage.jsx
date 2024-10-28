@@ -22,7 +22,7 @@ const HomePage = ({ imageStacks }) => {
     <div className="min-h-screen bg-gray-100">
       <Header />
       <div className="p-8">
-        <h1 className="text-4xl font-bold mb-8">Image Gallery</h1>
+        <h1 className="text-4xl font-bold mb-8">CLASS OF 2025</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {imageStacks.length > 0 ? (
             imageStacks.map((stack, index) => (

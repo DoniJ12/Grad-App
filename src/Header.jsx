@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center px-5 py-2 bg-gray-100 border-b-2 border-gray-300">
       <div className="text-lg font-bold text-gray-700">
-        <h1>MyApp</h1>
+        <h1>GCGALL</h1>
       </div>
       <nav className="flex items-center">
         <ul className="flex w-full space-x-2">
