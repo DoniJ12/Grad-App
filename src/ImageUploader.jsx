@@ -1,57 +1,60 @@
+// ImageUploader.js
 import React, { useState } from 'react';
 import Header from './Header';
 
 const ImageUploader = ({ addImageStack }) => {
-  const [images, setImages] = useState([]);
-  const [quote, setQuote] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [quote, setQuote] = useState('');
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    const fileURLs = files.map(file => URL.createObjectURL(file));
-    setImages(fileURLs);
+    const fileReaders = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file); // Convert to Base64
+      });
+    });
+
+    Promise.all(fileReaders).then((base64Images) => {
+      setSelectedImages(base64Images);
+    });
   };
 
   const handleSubmit = () => {
-    if (images.length > 0) {
-      addImageStack({ images, quote });
-      setImages([]);
-      setQuote("");
-      setShowPopup(true);
-
-      setTimeout(() => setShowPopup(false), 2000);
+    if (selectedImages.length > 0) {
+      addImageStack({ images: selectedImages, quote });
+      setSelectedImages([]);
+      setQuote('');
+      alert("Images uploaded successfully!"); // Popup notification
+    } else {
+      alert("Please select at least one image.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
-      <div className="flex flex-col items-center p-8">
-        <h2 className="text-3xl font-semibold mb-6">Upload Images</h2>
-        <input 
-          type="file" 
-          multiple 
-          onChange={handleImageUpload} 
-          className="mb-4 p-2 border border-gray-300 rounded"
+      <div className="p-8">
+        <h1 className="text-4xl font-bold mb-8">Upload Images</h1>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="mb-4"
         />
-        <input 
-          type="text" 
-          placeholder="Enter quote" 
-          value={quote} 
-          onChange={(e) => setQuote(e.target.value)} 
-          className="mb-4 p-2 w-full max-w-md border border-gray-300 rounded"
+        <input
+          type="text"
+          value={quote}
+          onChange={(e) => setQuote(e.target.value)}
+          placeholder="Add a quote for these images"
+          className="p-2 border border-gray-300 rounded w-full mb-4"
         />
-        <button 
-          onClick={handleSubmit} 
-          className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700"
-        >
+        <button onClick={handleSubmit} className="bg-blue-500 text-white p-2 rounded">
           Submit
         </button>
-        {showPopup && (
-          <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 rounded shadow-lg">
-            Images uploaded successfully!
-          </div>
-        )}
       </div>
     </div>
   );
