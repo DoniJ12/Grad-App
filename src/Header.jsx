@@ -19,7 +19,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
           </>
         ) : (
           <>
-
+          
           </>
         )}
       </nav>
